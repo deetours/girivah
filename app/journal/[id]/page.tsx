@@ -82,7 +82,7 @@ export default function JournalArticle() {
                     Entering the Spiti valley, the landscape resembles less a place on Earth and more a transmission from Mars. The silence is profound—not just an absence of noise, but a heavy, physical presence that presses against your eardrums.
                 </p>
 
-                <h2 className="font-display text-4xl md:text-5xl text-white pt-12 pb-6 border-b border-white/10 mb-8 w-[110%] -ml-[5%]">
+                <h2 className="font-display text-3xl md:text-5xl text-white pt-12 pb-6 border-b border-white/10 mb-8">
                     The Weight of Emptiness.
                 </h2>
 

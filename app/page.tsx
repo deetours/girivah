@@ -101,7 +101,7 @@ export default function Home() {
             <p className="font-sans text-xs tracking-[0.4em] text-white/50 uppercase">
               The Keepers of the High Passes
             </p>
-            <h1 className="font-display tracking-tight text-white leading-[0.85] uppercase">
+            <h1 className="font-display tracking-tight text-white leading-[0.85] uppercase text-4xl md:text-6xl lg:text-7xl">
               Beyond<br />
               <span className="text-accent">The Map.</span>
             </h1>
@@ -135,10 +135,10 @@ export default function Home() {
 
       {/* ═ ACT 3: THE BENDING GRID (Expeditions) ═ */}
       <section className="py-32 bg-secondary">
-        <div className="max-w-[1400px] mx-auto px-6 md:px-12 mb-20 flex flex-col md:flex-row justify-between items-end gap-10">
+        <div className="max-w-[1400px] mx-auto px-4 md:px-12 mb-20 flex flex-col md:flex-row justify-between items-end gap-10">
           <div>
             <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-6">The Routes</p>
-            <h2 className="font-display text-primary">Uncompromising<br />Journeys.</h2>
+            <h2 className="font-display text-3xl md:text-5xl lg:text-6xl text-primary">Uncompromising<br />Journeys.</h2>
           </div>
           <Link href="/expeditions" className="btn-ghost pb-0 md:pb-4 border-none hover:text-accent">
             View All Routes <ArrowRight size={14} className="inline ml-2" />
@@ -146,10 +146,10 @@ export default function Home() {
         </div>
 
         {/* MANEUVER 3+4: Scrollable Expedition Posters — spec-first, Apple bezier */}
-        <div className="flex gap-5 overflow-x-auto pb-20 px-6 md:px-12 snap-x snap-mandatory hide-scrollbar">
+        <div className="flex gap-5 overflow-x-auto pb-20 px-4 md:px-12 snap-x snap-mandatory hide-scrollbar">
           {expeditions.map((exp, i) => (
             <Link href={`/expeditions/${exp.id}`} key={exp.id}
-              className="min-w-[85vw] md:min-w-[42vw] lg:min-w-[28vw] aspect-[3/4] snap-center relative overflow-hidden group cursor-pointer flex-shrink-0 block"
+              className="min-w-[calc(100vw-2rem)] sm:min-w-[85vw] md:min-w-[42vw] lg:min-w-[28vw] aspect-[3/4] snap-center relative overflow-hidden group cursor-pointer flex-shrink-0 block"
             >
               {/* MANEUVER 3: Cinematic scale-from-1.08 reveal */}
               <motion.div

@@ -157,7 +157,7 @@ export default function JournalPage() {
           <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/30 to-transparent z-10" />
 
           {/* Pull content */}
-          <div className="absolute inset-0 p-8 md:p-16 flex flex-col justify-end text-left z-20">
+          <div className="absolute inset-0 p-4 sm:p-8 md:p-16 flex flex-col justify-end text-left z-20">
             <div className="flex gap-4 items-center mb-8">
               <span className="text-accent text-[9px] tracking-[0.35em] font-sans uppercase border border-accent/30 px-3 py-1 bg-accent/5">
                 {FEATURED_ARTICLE.category}
@@ -166,10 +166,10 @@ export default function JournalPage() {
                 {FEATURED_ARTICLE.date}
               </span>
             </div>
-            <h2 className="font-display text-5xl md:text-[7rem] text-white leading-[0.85] mb-8 md:w-3/4 group-hover:text-accent transition-colors duration-700">
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-[7rem] text-white leading-[0.85] mb-8 md:w-3/4 group-hover:text-accent transition-colors duration-700">
               {FEATURED_ARTICLE.title}
             </h2>
-            <p className="font-sans text-xl md:text-2xl font-light text-white/60 max-w-2xl leading-snug mb-6">
+            <p className="font-sans text-base sm:text-xl md:text-2xl font-light text-white/60 max-w-2xl leading-snug mb-6">
               {FEATURED_ARTICLE.excerpt}
             </p>
             <div className="flex items-center gap-3 text-[10px] tracking-[0.3em] text-white/30 font-sans uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-500">
