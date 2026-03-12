@@ -65,6 +65,7 @@
   html {
     background-color: #050505;
     /* Force void early */
+    overflow-x: clip; /* Prevents any child from causing horizontal scroll */
   }
 
   body {
@@ -105,20 +106,24 @@
     letter-spacing: -0.04em;
     font-weight: 700;
     text-transform: uppercase;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 
   h1 {
-    font-size: clamp(4rem, 10vw, 10rem);
+    /* Minimum scales with viewport — never fixed, prevents overflow */
+    font-size: clamp(2.5rem, 10vw, 10rem);
     line-height: 0.85;
   }
 
   h2 {
-    font-size: clamp(3rem, 6vw, 6rem);
+    /* Was 3rem min — too large for narrow mobile containers */
+    font-size: clamp(1.75rem, 6.5vw, 6rem);
     line-height: 0.9;
   }
 
   h3 {
-    font-size: clamp(1.5rem, 3vw, 3rem);
+    font-size: clamp(1.25rem, 3.5vw, 3rem);
     line-height: 1;
   }
 

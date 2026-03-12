@@ -134,11 +134,11 @@ export default function Home() {
       </section>
 
       {/* ═ ACT 3: THE BENDING GRID (Expeditions) ═ */}
-      <section className="py-32 bg-secondary">
+      <section className="py-32 bg-secondary overflow-hidden">
         <div className="max-w-[1400px] mx-auto px-6 md:px-12 mb-20 flex flex-col md:flex-row justify-between items-end gap-10">
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-[10px] tracking-[0.2em] md:tracking-[0.3em] uppercase text-muted-foreground mb-6">The Routes</p>
-            <h2 className="font-display text-primary">Uncompromising<br />Journeys.</h2>
+            <h2 className="font-display text-white">Uncompromising<br />Journeys.</h2>
           </div>
           <Link href="/expeditions" className="btn-ghost pb-0 md:pb-4 border-none hover:text-accent">
             View All Routes <ArrowRight size={14} className="inline ml-2" />
