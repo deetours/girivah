@@ -137,7 +137,7 @@ export default function Home() {
       <section className="py-32 bg-secondary">
         <div className="max-w-[1400px] mx-auto px-6 md:px-12 mb-20 flex flex-col md:flex-row justify-between items-end gap-10">
           <div>
-            <p className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-6">The Routes</p>
+            <p className="text-[10px] tracking-[0.2em] md:tracking-[0.3em] uppercase text-muted-foreground mb-6">The Routes</p>
             <h2 className="font-display text-primary">Uncompromising<br />Journeys.</h2>
           </div>
           <Link href="/expeditions" className="btn-ghost pb-0 md:pb-4 border-none hover:text-accent">
