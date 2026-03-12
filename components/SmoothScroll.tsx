@@ -1,10 +1,10 @@
 'use client'
 
-import { ReactLenis } from '@studio-freight/react-lenis'
+import { Lenis } from 'lenis/react'
 
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
     return (
-        <ReactLenis
+        <Lenis
             root
             options={{
                 lerp: 0.15,          // Snappy easing. 0.1 is too floaty; 0.15 feels immediate but smooth.
@@ -15,6 +15,6 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
             }}
         >
             {children}
-        </ReactLenis>
+        </Lenis>
     )
 }
