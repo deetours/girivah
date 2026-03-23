@@ -126,20 +126,28 @@ export default function PhilosophyPage() {
       </section>
 
       {/* ═ CINEMATIC INTERLUDE ═ */}
-      <section className="w-full h-[60vh] md:h-[80vh] relative overflow-hidden mb-48">
+      <section className="w-full h-[60vh] md:h-[80vh] relative overflow-hidden mb-48 group">
         <motion.div style={{ y: heroY }} className="absolute inset-0">
-          <Image
-            src="/about-interlude.jpg"
-            alt="The Standard is the Mountain"
-            fill
-            priority
-            className="object-cover opacity-40 grayscale hover:grayscale-0 transition-all duration-1000"
-          />
-          <div className="absolute inset-0 bg-[#050505]/40" />
+          <motion.div 
+            initial={{ scale: 1.1 }} 
+            whileInView={{ scale: 1 }} 
+            viewport={{ once: true }}
+            transition={{ duration: 3, ease: APPLE_EASE }} 
+            className="absolute inset-0"
+          >
+            <Image
+              src="/hero-mountain.jpg"
+              alt="The Standard is the Mountain"
+              fill
+              priority
+              className="object-cover opacity-40 grayscale group-hover:grayscale-0 transition-all duration-1000"
+            />
+          </motion.div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent z-10" />
         </motion.div>
-        <div className="absolute inset-0 flex items-center justify-center p-6">
-          <blockquote className="font-display text-[clamp(2rem,6vw,6rem)] text-white tracking-tighter opacity-40 uppercase italic text-center">
-            &ldquo;The standard is <span className="text-accent not-italic">the mountain.</span>&rdquo;
+        <div className="absolute inset-0 flex items-center justify-center p-6 z-20">
+          <blockquote className="font-display text-[clamp(2rem,6vw,6rem)] text-white tracking-tighter opacity-70 uppercase italic text-center">
+            &ldquo;The standard is <span className="text-accent not-italic border-b-2 border-accent pb-1">the mountain.</span>&rdquo;
           </blockquote>
         </div>
       </section>
@@ -164,8 +172,8 @@ export default function PhilosophyPage() {
           Are you the right person<br />
           <span className="text-white/20">for the mountain?</span>
         </h2>
-        <Link href="/expeditions" className="btn-accent px-12 py-5">
-          View Expeditions
+        <Link href="/expeditions" className="btn-accent px-12 py-5 uppercase tracking-[0.2em] text-[10px] inline-block hover:shadow-[0_0_30px_rgba(255,62,0,0.3)] transition-shadow">
+          Request Expedition Dossier
         </Link>
       </section>
 

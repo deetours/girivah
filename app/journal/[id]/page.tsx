@@ -2,18 +2,21 @@
 
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion, useScroll, useSpring } from 'framer-motion'
-import { ArrowLeft, Clock, CodeSquare } from 'lucide-react'
+import { ArrowLeft, Clock } from 'lucide-react'
 
 // Mock Data
 const article = {
     title: 'The Silence of Spiti',
     category: 'Field Notes',
     readTime: '8 Min Read',
-    author: 'Kavi The Himalayan',
+    author: 'Arjun Mehta',
     date: 'OCT 12, 2024',
     excerpt: 'A meditation on emptiness. We rode 400 kilometers into the high cold desert to understand what happens when the noise finally stops.',
 }
+
+const APPLE_EASE = [0.32, 0.72, 0, 1] as const
 
 export default function JournalArticle() {
     const { scrollYProgress } = useScroll()
@@ -46,30 +49,37 @@ export default function JournalArticle() {
                             {article.excerpt}
                         </p>
                     </div>
-                    <div className="md:col-span-4 flex flex-col justify-end gap-8 pb-4">
+                    <div className="md:col-span-4 flex flex-col justify-end gap-8 pb-4 border-l border-white/10 pl-8">
                         <div>
-                            <span className="block text-[10px] tracking-[0.3em] font-sans uppercase text-muted-foreground mb-2">Category</span>
-                            <span className="text-white text-sm font-sans uppercase">{article.category}</span>
+                            <span className="block text-[10px] tracking-[0.3em] font-sans uppercase text-white/30 mb-2">Category</span>
+                            <span className="text-white text-sm font-sans uppercase tracking-[0.2em]">{article.category}</span>
                         </div>
                         <div>
-                            <span className="block text-[10px] tracking-[0.3em] font-sans uppercase text-muted-foreground mb-2">Author</span>
-                            <span className="text-white text-sm font-sans uppercase">{article.author}</span>
+                            <span className="block text-[10px] tracking-[0.3em] font-sans uppercase text-white/30 mb-2">Transmission By</span>
+                            <span className="text-white text-sm font-sans uppercase tracking-[0.2em]">{article.author}</span>
                         </div>
                         <div>
-                            <span className="block text-[10px] tracking-[0.3em] font-sans uppercase text-muted-foreground mb-2">Duration</span>
-                            <span className="text-white text-sm font-sans uppercase flex items-center gap-2"><Clock size={12} className="text-accent" /> {article.readTime}</span>
+                            <span className="block text-[10px] tracking-[0.3em] font-sans uppercase text-white/30 mb-2">Duration</span>
+                            <span className="text-white text-sm font-sans uppercase tracking-[0.2em] flex items-center gap-2"><Clock size={12} className="text-accent" /> {article.readTime}</span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* ═ THE ARTICLE HERO ═ */}
-            <section className="w-full h-[60vh] md:h-[80vh] bg-gradient-to-tr from-[#111] to-[#050505] mb-32 relative border-y border-white/5">
-                <div className="absolute inset-0 flex items-center justify-center opacity-10 mix-blend-overlay">
-                    <CodeSquare size={400} className="text-white" />
-                </div>
-                {/* Gradient bleed into article body */}
-                <div className="absolute bottom-0 left-0 right-0 h-[30vh] bg-gradient-to-t from-[#050505] to-transparent pointer-events-none" />
+            {/* ═ CINEMATIC INTERLUDE HERO ═ */}
+            <section className="w-full h-[60vh] md:h-[80vh] relative overflow-hidden mb-32 group">
+                 <motion.div 
+                    initial={{ scale: 1.1 }} 
+                    whileInView={{ scale: 1 }} 
+                    viewport={{ once: true }}
+                    transition={{ duration: 15, ease: 'linear' }} 
+                    className="absolute inset-0"
+                 >
+                     <Image src="/exp-spiti.jpg" alt="Spiti Void" fill className="object-cover opacity-40 grayscale group-hover:grayscale-0 transition-all duration-1000" />
+                 </motion.div>
+                 {/* Gradient bleed into article body */}
+                 <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent pointer-events-none" />
+                 <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-[#050505] to-transparent pointer-events-none" />
             </section>
 
             {/* ═ THE EDITORIAL CONTENT ═ */}
@@ -82,7 +92,7 @@ export default function JournalArticle() {
                     Entering the Spiti valley, the landscape resembles less a place on Earth and more a transmission from Mars. The silence is profound—not just an absence of noise, but a heavy, physical presence that presses against your eardrums.
                 </p>
 
-                <h2 className="font-display text-3xl md:text-5xl text-white pt-12 pb-6 border-b border-white/10 mb-8">
+                <h2 className="font-display text-3xl md:text-5xl text-white pt-12 pb-6 border-b border-white/10 mb-8 mt-16">
                     The Weight of Emptiness.
                 </h2>
 
@@ -106,17 +116,23 @@ export default function JournalArticle() {
                     This is exactly why we mandate no internet access. To hand you a connection to the outside world in the middle of Spiti would be to abort the very process you traveled here for. The silence is not a feature of the itinerary; it is the entire point.
                 </p>
 
+                <div className="pt-24 pb-8 flex justify-center">
+                   <div className="w-16 h-px bg-accent/50" />
+                </div>
             </article>
 
             {/* ═ FOOTER AUTHOR META ═ */}
-            <div className="max-w-[750px] mx-auto px-6 mt-32 pt-16 border-t border-white/10 flex flex-col md:flex-row gap-12 items-start md:items-center">
-                <div className="w-24 h-24 rounded-full bg-[#111] border border-white/10 flex-shrink-0" />
-                <div>
-                    <h4 className="font-display text-3xl text-white mb-4">{article.author}</h4>
-                    <p className="font-sans text-white/50 font-light leading-relaxed max-w-sm">
-                        Lead UIAGM Guide and founding partner of Girivah. Specializes in overland traverses across Zanskar and Lahaul-Spiti regions.
-                    </p>
-                </div>
+            <div className="max-w-[750px] mx-auto px-6 pt-16 border-t border-white/5 flex flex-col md:flex-row gap-12 items-start md:items-center group">
+                 <div className="w-24 h-24 rounded-full bg-[#111] border border-white/10 flex-shrink-0 relative overflow-hidden">
+                    <Image src="/hero-cinematic.jpg" fill alt="Arjun Mehta" className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+                 </div>
+                 <div>
+                     <h4 className="font-display text-3xl text-white mb-2">{article.author}</h4>
+                     <p className="text-[10px] uppercase font-sans tracking-[0.3em] text-accent mb-4">Lead Expedition Controller</p>
+                     <p className="font-sans text-white/50 font-light leading-relaxed max-w-sm text-sm">
+                         UIAGM Certified lead guide. Specializes in overland traverses across Zanskar and Lahaul-Spiti regions. Oversees all protocol decisions.
+                     </p>
+                 </div>
             </div>
 
         </main>

@@ -64,6 +64,7 @@
 
   html {
     background-color: #050505;
+    color-scheme: dark;
     /* Force void early */
     overflow-x: clip; /* Prevents any child from causing horizontal scroll */
   }
@@ -202,5 +203,14 @@
   /* DECORATIVE LINE */
   .rule {
     @apply block w-12 h-px bg-accent mb-6;
+  }
+
+  /* UTILITIES */
+  .hide-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none;    /* Firefox */
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;            /* Chrome, Safari, Opera */
   }
 }

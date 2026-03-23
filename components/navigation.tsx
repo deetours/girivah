@@ -15,10 +15,11 @@ const navLinks = [
   { name: 'Expeditions', href: '/expeditions' },
   { name: 'Journal', href: '/journal' },
   { name: 'About', href: '/about' },
+  { name: 'Contact', href: '/contact' },
 ]
 
 // MANEUVER 3: Apple-grade Bezier easing curve
-const APPLE_EASE = [0.32, 0.72, 0, 1]
+const APPLE_EASE = [0.32, 0.72, 0, 1] as const
 
 export default function Navigation() {
   const [hidden, setHidden] = useState(false)

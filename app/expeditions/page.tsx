@@ -6,12 +6,12 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useRef } from 'react'
+import { motion, AnimatePresence, useScroll, useTransform, useInView } from 'framer-motion'
 import { ArrowUpRight, Triangle } from 'lucide-react'
 
 // MANEUVER 3: Apple-grade bezier — used for all motion
-const APPLE_EASE = [0.32, 0.72, 0, 1]
+const APPLE_EASE = [0.32, 0.72, 0, 1] as const
 
 // MANEUVER 4: Expedition data rebuilt with Technical Specs as primary anchor
 const ALL_EXPEDITIONS = [
@@ -71,33 +71,65 @@ export default function ExpeditionsPage() {
     activeFilter === 'All' ? true : exp.type === activeFilter
   )
 
-  return (
-    <main className="bg-background min-h-[100vh] pt-32 pb-40 selection:bg-accent selection:text-white">
-      <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+  const heroRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"]
+  })
+  
+  const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"])
+  const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0])
 
-        {/* ═ Header ═ */}
-        <div className="mb-16 md:mb-24 mt-12 md:mt-24">
+  return (
+    <main className="bg-background min-h-[100vh] selection:bg-accent selection:text-white pb-40">
+      
+      {/* ═ HERO ═ */}
+      <section ref={heroRef} className="relative h-[65vh] w-full overflow-hidden bg-[#050505]">
+        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="absolute inset-0 z-0">
+          <motion.div 
+            initial={{ scale: 1.05 }} 
+            animate={{ scale: 1 }} 
+            transition={{ duration: 10, ease: "linear" }}
+            className="absolute inset-0"
+          >
+            <Image
+              src="/hero-mountain.jpg"
+              alt="The Expeditions"
+              fill
+              priority
+              className="object-cover opacity-40 grayscale"
+            />
+          </motion.div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-[#050505]/40" />
+        </motion.div>
+
+        <div className="relative z-10 w-full h-full flex flex-col justify-end pb-12 px-6 md:px-12 max-w-[1400px] mx-auto">
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: APPLE_EASE }}
-            className="text-[10px] tracking-[0.3em] font-sans text-white/40 uppercase mb-6"
+            transition={{ duration: 0.6, ease: APPLE_EASE, delay: 0.2 }}
+            className="text-[10px] tracking-[0.3em] font-sans text-accent uppercase mb-4"
           >
             Curated Routes
           </motion.p>
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: APPLE_EASE, delay: 0.08 }}
-            className="text-white"
+            transition={{ duration: 0.7, ease: APPLE_EASE, delay: 0.3 }}
+            className="font-display text-[clamp(4rem,10vw,10rem)] leading-[0.85] tracking-tighter text-white uppercase mix-blend-overlay opacity-90"
           >
-            The <br className="hidden md:block" />
-            <span className="text-accent">Expeditions.</span>
+            The<br />
+            <span className="text-accent/80 mix-blend-normal relative">
+              Expeditions.
+              <span className="absolute inset-0 blur-xl bg-accent opacity-10" />
+            </span>
           </motion.h1>
         </div>
+      </section>
 
+      <div className="max-w-[1400px] mx-auto px-6 md:px-12">
         {/* ═ Filter Bar ═ */}
-        <div className="sticky top-[64px] z-30 bg-background/90 backdrop-blur-xl py-5 mb-20 -mx-6 px-6 md:mx-0 md:px-0 border-b border-white/5">
+        <div className="sticky top-[64px] z-30 bg-[#050505]/90 backdrop-blur-xl py-5 mt-4 mb-20 -mx-6 px-6 md:mx-0 md:px-0 border-b border-white/5">
           <div className="flex gap-3 overflow-x-auto pb-1">
             {FILTERS.map((f) => (
               <motion.button

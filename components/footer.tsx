@@ -4,7 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { Instagram, Twitter, Compass } from 'lucide-react'
+
 
 export default function Footer() {
   const { scrollYProgress } = useScroll()
@@ -28,12 +28,6 @@ export default function Footer() {
             <p className="font-sans text-xl font-light text-white/50 leading-relaxed max-w-sm">
               Authentic, uncompromising Himalayan expeditions for those seeking absolute presence.
             </p>
-            <div className="flex flex-col gap-2 mt-8 max-w-[240px]">
-              <span className="text-[10px] tracking-[0.3em] font-sans uppercase text-accent mb-2">Absolute Presence</span>
-              <p className="text-[11px] leading-relaxed text-white/50 font-light italic">
-                We believe in the power of the high passes. We do not broadcast. We experience.
-              </p>
-            </div>
           </div>
 
           {/* Links Grid */}
@@ -79,14 +73,7 @@ export default function Footer() {
             <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
           </div>
         </div>
-
       </motion.div>
-
-      {/* Background Graphic Element */}
-      <h1 className="absolute -bottom-10 left-1/2 -translate-x-1/2 font-display text-[25vw] leading-none text-white/5 tracking-tighter w-full text-center pointer-events-none select-none">
-        GIRIVAH
-      </h1>
-
     </footer>
   )
 }
