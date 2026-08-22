@@ -213,4 +213,9 @@
   .hide-scrollbar::-webkit-scrollbar {
     display: none;            /* Chrome, Safari, Opera */
   }
+
+  .border-text {
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.4);
+    color: transparent;
+  }
 }

@@ -19,20 +19,6 @@ const config = {
         mono: ["var(--font-sans)", ...defaultTheme.fontFamily.mono], // Inter as mono stand-in for meta labels
       },
 
-      // ═ THE VOID COLOR SYSTEM ═
-      colors: {
-        background: "#050505",   // True void (not #000 — avoids eye strain)
-        foreground: "#FFFFFF",
-        primary: "#111111",
-        "primary-foreground": "#FFFFFF",
-        secondary: "#161616",
-        "secondary-foreground": "#E0E0E0",
-        muted: "#222222",
-        "muted-foreground": "#888888",
-        accent: "#FF3E00",       // Safety orange — survival equipment / urgency
-        "accent-foreground": "#FFFFFF",
-        border: "#2A2A2A",
-      },
 
       // ═ BRUTALIST SHARP EDGES (Apple hardware precision) ═
       borderRadius: {

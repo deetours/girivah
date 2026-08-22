@@ -1,33 +1,44 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, Suspense } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, Check, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 // Booking Steps
-type Step = 'expedition' | 'dates' | 'travelers' | 'details' | 'review' | 'success'
+type Step = 'trip-review' | 'expedition' | 'dates' | 'travelers' | 'details' | 'review' | 'success'
 
-const expeditionsInfo: Record<string, { image: string, type: string }> = {
-  'Ladakh High Pass (Motorcycle)': { image: '/exp-ladakh.jpg', type: 'Motorcycle' },
-  'Spiti Valley Circuit (4×4)': { image: '/exp-spiti.jpg', type: '4x4 Overland' },
-  'Zanskar Chadar Trek': { image: '/hero-mountain.jpg', type: 'High-Altitude' },
-  'Kaza Nomadic Run (Motorcycle)': { image: '/hero-cinematic.jpg', type: 'Motorcycle' },
-}
+import { EXPEDITIONS } from '@/lib/data/expeditions'
+import { vehicles } from '@/lib/data/vehicles'
+import { stays } from '@/lib/data/stays'
+import { submitBookingApplication } from '@/lib/actions/booking'
+import { APPLE_EASE } from '@/lib/constants'
+import { MarketplaceItem } from '@/lib/types/marketplace'
+import { useJourneyStore } from '@/lib/store/journey-store'
+import { getItemByKind } from '@/lib/data/marketplace-lookup'
 
-const expeditions = Object.keys(expeditionsInfo)
 const months = ['June 2024', 'July 2024', 'August 2024', 'September 2024']
 
-export default function BookingApplication() {
+function BookingApplicationContent() {
+  const searchParams = useSearchParams()
+  const urlItem = searchParams.get('item')
+  const urlKind = searchParams.get('kind')
+  
+  const tripStore = useJourneyStore()
+  const hasTripBag = tripStore.items.length > 0
+
   const [currentStep, setCurrentStep] = useState<Step>('expedition')
   const [direction, setDirection] = useState(1)
   const [refNo, setRefNo] = useState('')
   const [isClient, setIsClient] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // State
   const [data, setData] = useState({
-    expedition: '',
+    expedition: '', // we will store the slug here if single-item
+    kind: 'trip', // default kind
     date: '',
     travelers: 1,
     name: '',
@@ -35,32 +46,56 @@ export default function BookingApplication() {
     experience: '',
   })
 
-  // Hydration & Persistence
   useEffect(() => {
     setIsClient(true)
-    setRefNo(`GVH-${Math.floor(Math.random() * 10000)}`)
-
-    const saved = localStorage.getItem('girivah_booking_data')
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved)
-        setData(prev => ({ ...prev, ...parsed }))
-      } catch (e) {
-        console.error("Failed to parse saved booking data")
-      }
+    if (hasTripBag && !urlItem) {
+      setCurrentStep('trip-review')
+    } else if (urlItem && urlKind) {
+      setData(prev => ({ ...prev, expedition: urlItem, kind: urlKind }))
+      setCurrentStep('dates')
+    } else {
+      setData(prev => ({ ...prev, kind: 'trip' }))
     }
-  }, [])
+  }, [urlItem, urlKind, hasTripBag])
 
-  useEffect(() => {
-    if (isClient) {
-      localStorage.setItem('girivah_booking_data', JSON.stringify(data))
+  const itemsForKind = useMemo(() => {
+    switch (data.kind) {
+      case 'vehicle': return vehicles;
+      case 'stay': return stays;
+      default: return EXPEDITIONS;
     }
-  }, [data, isClient])
+  }, [data.kind])
+
+  const selectedItem = useMemo(() => {
+    return itemsForKind.find(item => item.slug === data.expedition) as MarketplaceItem | undefined
+  }, [itemsForKind, data.expedition])
 
   const handleNext = useCallback((step: Step) => {
     setDirection(1)
     setCurrentStep(step)
   }, [])
+
+  const handleSubmit = useCallback(async () => {
+    setIsSubmitting(true)
+    const res = await submitBookingApplication({
+      expeditionId: hasTripBag ? 'multi-trip' : data.expedition,
+      items: hasTripBag ? tripStore.items.map(i => ({ slug: i.slug, kind: i.kind })) : [{ slug: data.expedition, kind: data.kind }],
+      name: data.name,
+      email: data.email,
+      phone: '',
+      age: '',
+      medicalConditions: '',
+      ridingExperience: data.experience,
+      emergencyContactName: '',
+      emergencyContactPhone: ''
+    })
+    
+    if (hasTripBag) tripStore.clear()
+    
+    setRefNo(res.referenceId)
+    setIsSubmitting(false)
+    handleNext('success')
+  }, [data, handleNext, hasTripBag, tripStore])
 
   const handleBack = useCallback((step: Step) => {
     setDirection(-1)
@@ -71,22 +106,22 @@ export default function BookingApplication() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
+        if (currentStep === 'trip-review') handleNext('dates')
         if (currentStep === 'travelers') handleNext('details')
         if (currentStep === 'details' && data.name && data.email.includes('@')) handleNext('review')
-        if (currentStep === 'review') handleNext('success')
+        if (currentStep === 'review' && !isSubmitting) handleSubmit()
       }
     };
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [currentStep, data.name, data.email, handleNext])
+  }, [currentStep, data.name, data.email, handleNext, handleSubmit, isSubmitting])
 
   const calculateProgress = () => {
-    const steps = ['expedition', 'dates', 'travelers', 'details', 'review', 'success']
+    const steps = hasTripBag 
+      ? ['trip-review', 'dates', 'travelers', 'details', 'review', 'success']
+      : ['expedition', 'dates', 'travelers', 'details', 'review', 'success']
     return ((steps.indexOf(currentStep)) / (steps.length - 1)) * 100
   }
-
-  // APPLE BEZIER: Physical, deliberate step transitions
-  const APPLE_EASE = [0.32, 0.72, 0, 1]
 
   const variants = {
     enter: (direction: number) => ({
@@ -111,26 +146,26 @@ export default function BookingApplication() {
   if (!isClient) return <div className="fixed inset-0 bg-[#050505]" />
 
   return (
-    <main className="fixed inset-0 bg-[#050505] z-50 flex flex-col justify-between selection:bg-accent selection:text-white overflow-hidden text-white font-sans">
+    <main className="fixed inset-0 bg-[#050505] z-50 flex flex-col justify-between selection:bg-accent selection:text-white text-white font-sans overflow-y-auto hide-scrollbar">
 
-      {/* ═ CONTEXTUAL BACKGROUND ═ */}
+      {/* CONTEXTUAL BACKGROUND */}
       <AnimatePresence>
-        {data.expedition && expeditionsInfo[data.expedition] && currentStep !== 'success' && currentStep !== 'expedition' && (
+        {selectedItem && !hasTripBag && currentStep !== 'success' && currentStep !== 'expedition' && (
           <motion.div
-            key={data.expedition}
+            key={selectedItem.slug}
             initial={{ opacity: 0, scale: 1.05 }}
             animate={{ opacity: 0.15, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 1.5, ease: APPLE_EASE }}
-            className="absolute inset-0 z-0 pointer-events-none"
+            className="absolute inset-0 z-0 pointer-events-none fixed"
           >
-            <Image src={expeditionsInfo[data.expedition].image} alt="Background" fill className="object-cover grayscale mix-blend-luminosity" />
+            <Image src={selectedItem.media[0].src} alt="Background" fill className="object-cover grayscale mix-blend-luminosity" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/50 to-[#050505]" />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ═ TOP-EDGE PROGRESS BAR (Architectural) ═ */}
+      {/* TOP-EDGE PROGRESS BAR */}
       <div className="fixed top-0 left-0 right-0 h-[2px] bg-white/5 z-[60]">
         <motion.div
           className="h-full bg-accent"
@@ -140,13 +175,20 @@ export default function BookingApplication() {
         />
       </div>
 
-      {/* ═ HEADER ═ */}
-      <header className="flex justify-between items-center p-8 md:p-12 absolute top-0 w-full z-20">
+      {/* HEADER */}
+      <header className="flex justify-between items-center p-8 md:p-12 sticky top-0 w-full z-20 bg-gradient-to-b from-[#050505] to-transparent">
         {currentStep !== 'success' ? (
           <button
             onClick={() => {
-              if (currentStep === 'expedition') window.location.href = '/expeditions'
-              if (currentStep === 'dates') handleBack('expedition')
+              if (currentStep === 'trip-review' || currentStep === 'expedition') {
+                if (data.kind === 'vehicle') window.location.href = '/rides';
+                else if (data.kind === 'stay') window.location.href = '/stays';
+                else window.location.href = '/marketplace';
+              }
+              if (currentStep === 'dates') {
+                if (urlItem) window.history.back();
+                else handleBack(hasTripBag ? 'trip-review' : 'expedition');
+              }
               if (currentStep === 'travelers') handleBack('dates')
               if (currentStep === 'details') handleBack('travelers')
               if (currentStep === 'review') handleBack('details')
@@ -154,18 +196,55 @@ export default function BookingApplication() {
             className="flex items-center gap-3 text-[10px] tracking-[0.3em] uppercase text-white/50 hover:text-white transition-colors focus-visible:text-accent"
           >
             <ArrowLeft size={14} />
-            {currentStep === 'expedition' ? 'Abort Application' : 'Back'}
+            {currentStep === 'expedition' || currentStep === 'trip-review' ? 'Abort Application' : 'Back'}
           </button>
         ) : <div />}
 
         <div className="text-[10px] tracking-[0.3em] font-medium text-white/30 uppercase">
-          Step {['expedition', 'dates', 'travelers', 'details', 'review', 'success'].indexOf(currentStep) + 1} / 6
+          Step {hasTripBag 
+            ? ['trip-review', 'dates', 'travelers', 'details', 'review', 'success'].indexOf(currentStep) + 1
+            : ['expedition', 'dates', 'travelers', 'details', 'review', 'success'].indexOf(currentStep) + 1} / 6
         </div>
       </header>
 
-      {/* ═ CONTENT ═ */}
-      <div className="flex-1 flex items-center justify-center px-6 md:px-12 w-full max-w-5xl mx-auto h-full relative z-10">
+      {/* CONTENT */}
+      <div className="flex-1 flex flex-col px-6 md:px-12 w-full max-w-5xl mx-auto min-h-max relative z-10 py-24">
         <AnimatePresence custom={direction} mode="wait">
+          
+          {/* STEP 0: TRIP REVIEW (Multi-item) */}
+          {currentStep === 'trip-review' && (
+            <motion.div
+              key="step0"
+              custom={direction}
+              variants={variants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.55, ease: APPLE_EASE }}
+              className="w-full max-w-4xl"
+            >
+              <h1 className="font-display text-4xl md:text-7xl mb-12 text-white leading-tight">
+                Your custom <br /><span className="italic font-light text-white/40">Manifest.</span>
+              </h1>
+              <div className="flex flex-col gap-4 mb-12">
+                {tripStore.items.map(item => {
+                  const resolved = getItemByKind(item.kind, item.slug)
+                  if (!resolved) return null
+                  return (
+                    <div key={item.key} className="flex justify-between items-center p-6 md:p-8 border border-white/10 bg-white/[0.02]">
+                       <div>
+                         <span className="block text-[10px] uppercase font-sans tracking-widest text-accent mb-2">{item.kind}</span>
+                         <h3 className="font-display text-2xl text-white">{resolved.title}</h3>
+                       </div>
+                    </div>
+                  )
+                })}
+              </div>
+              <button onClick={() => handleNext('dates')} className="btn-accent px-12 py-5 flex items-center justify-center gap-4">
+                Confirm Manifest <ChevronRight size={18} />
+              </button>
+            </motion.div>
+          )}
 
           {/* STEP 1: EXPEDITION */}
           {currentStep === 'expedition' && (
@@ -183,24 +262,24 @@ export default function BookingApplication() {
                 Which route <br /><span className="italic font-light text-white/40">calls you?</span>
               </h1>
               <div className="flex flex-col gap-2">
-                {expeditions.map(exp => (
+                {itemsForKind.map((item: any) => (
                   <button
-                    key={exp}
+                    key={item.slug}
                     onClick={() => {
-                      setData({ ...data, expedition: exp })
+                      setData({ ...data, expedition: item.slug })
                       setTimeout(() => handleNext('dates'), 400)
                     }}
                     className={`text-left p-6 md:p-8 text-xl md:text-2xl font-light border-b w-full transition-all duration-500 flex justify-between items-center group relative overflow-hidden
-                      ${data.expedition === exp
+                      ${data.expedition === item.slug
                         ? 'border-accent text-white bg-accent/5'
                         : 'border-white/10 text-white/40 hover:text-white hover:border-white/20'}`}
                   >
-                    <span className="relative z-10">{exp}</span>
-                    {data.expedition === exp && <Check className="text-accent relative z-10" />}
+                    <span className="relative z-10">{item.title}</span>
+                    {data.expedition === item.slug && <Check className="text-accent relative z-10" />}
                     
                     {/* Hover Image Reveal */}
                     <div className="absolute inset-0 w-full h-full opacity-0 group-hover:opacity-[0.03] transition-opacity duration-500 pointer-events-none z-0">
-                       <Image src={expeditionsInfo[exp].image} alt="Preview" fill className="object-cover" />
+                       <Image src={item.media[0].src} alt="Preview" fill className="object-cover" />
                     </div>
                   </button>
                 ))}
@@ -221,10 +300,10 @@ export default function BookingApplication() {
               className="w-full max-w-4xl"
             >
               <h1 className="font-display text-4xl md:text-7xl mb-4 text-white">
-                When do <br /><span className="italic font-light text-white/40">we ride?</span>
+                When do <br /><span className="italic font-light text-white/40">we go?</span>
               </h1>
               <p className="text-[10px] tracking-[0.3em] uppercase text-accent mb-12">
-                Mission: {data.expedition}
+                Mission: {hasTripBag ? 'Multi-Item Manifest' : selectedItem?.title}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {months.map(m => (
@@ -355,11 +434,13 @@ export default function BookingApplication() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 border-b border-white/5 pb-12 relative z-10">
                   <div>
-                    <span className="block text-[10px] tracking-[0.3em] uppercase text-white/40 mb-3">Expedition</span>
-                    <span className="text-xl md:text-3xl font-light text-white leading-tight">{data.expedition}</span>
+                    <span className="block text-[10px] tracking-[0.3em] uppercase text-white/40 mb-3">Item</span>
+                    <span className="text-xl md:text-3xl font-light text-white leading-tight">
+                       {hasTripBag ? `${tripStore.items.length} Custom Items` : selectedItem?.title}
+                    </span>
                   </div>
                   <div>
-                    <span className="block text-[10px] tracking-[0.3em] uppercase text-white/40 mb-3">Departure</span>
+                    <span className="block text-[10px] tracking-[0.3em] uppercase text-white/40 mb-3">Dates</span>
                     <span className="text-xl md:text-3xl font-light text-white">{data.date}</span>
                   </div>
                 </div>
@@ -378,8 +459,8 @@ export default function BookingApplication() {
               </div>
 
               <div className="flex justify-start">
-                  <button onClick={() => handleNext('success')} className="btn-accent px-16 py-6 text-sm tracking-[0.3em] w-full md:w-auto hover:shadow-[0_0_40px_rgba(255,62,0,0.3)] transition-shadow">
-                    Commit to Expedition
+                  <button onClick={handleSubmit} disabled={isSubmitting} className="btn-accent px-16 py-6 text-sm tracking-[0.3em] w-full md:w-auto hover:shadow-[0_0_40px_rgba(255,62,0,0.3)] transition-shadow">
+                    {isSubmitting ? 'Transmitting...' : 'Commit to Selection'}
                   </button>
               </div>
             </motion.div>
@@ -418,7 +499,7 @@ export default function BookingApplication() {
                    </div>
                 </div>
 
-                <Link href="/" className="inline-block px-10 py-5 border border-white/20 uppercase tracking-[0.3em] text-[10px] text-white hover:bg-white hover:text-black transition-all">
+                <Link href="/marketplace" className="inline-block px-10 py-5 border border-white/20 uppercase tracking-[0.3em] text-[10px] text-white hover:bg-white hover:text-black transition-all">
                   Return to Base
                 </Link>
               </div>
@@ -445,9 +526,9 @@ export default function BookingApplication() {
         </AnimatePresence>
       </div>
 
-      {/* ═ PERSISTENT MINI-BAR ═ */}
+      {/* PERSISTENT MINI-BAR */}
       <AnimatePresence>
-        {data.expedition && currentStep !== 'expedition' && currentStep !== 'success' && (
+        {(hasTripBag || selectedItem) && currentStep !== 'expedition' && currentStep !== 'trip-review' && currentStep !== 'success' && (
           <motion.div
              initial={{ y: 20, opacity: 0 }}
              animate={{ y: 0, opacity: 1 }}
@@ -456,7 +537,9 @@ export default function BookingApplication() {
           >
              <div className="flex gap-4 items-center">
                  <span className="text-[10px] uppercase tracking-[0.3em] text-white/40 hidden md:block border-r border-white/10 pr-4">Active Protocol</span>
-                 <span className="font-sans text-xs tracking-widest text-white/80">{data.expedition}</span>
+                 <span className="font-sans text-xs tracking-widest text-white/80">
+                   {hasTripBag ? 'Multi-Item Manifest' : selectedItem?.title}
+                 </span>
              </div>
              <div className="flex gap-4 items-center">
                 <span className="text-[10px] tracking-[0.3em] font-sans uppercase text-white/50 hidden md:inline">Composition</span>
@@ -469,5 +552,13 @@ export default function BookingApplication() {
       </AnimatePresence>
 
     </main>
+  )
+}
+
+export default function BookingApplication() {
+  return (
+    <Suspense fallback={<div className="fixed inset-0 bg-[#050505]" />}>
+      <BookingApplicationContent />
+    </Suspense>
   )
 }

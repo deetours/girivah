@@ -30,6 +30,9 @@ export const metadata: Metadata = {
     description: 'Curated Himalayan expeditions for those who seek transformation—not just destination.',
     type: 'website',
   },
+}
+
+export const viewport = {
   themeColor: '#050505',
 }
 
