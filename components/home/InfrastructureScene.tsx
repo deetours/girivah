@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
@@ -92,7 +92,7 @@ export function InfrastructureScene() {
         </div>
 
         {/* Right: Technical Wireframe / Blueprint Graphic */}
-        <div className="w-full md:w-1/2 h-full absolute md:relative inset-0 flex items-center justify-center pointer-events-none opacity-20 md:opacity-100 mix-blend-screen md:mix-blend-normal z-10">
+        <div className="w-full md:w-1/2 h-full md:absolute md:inset-0 flex items-center justify-center pointer-events-none opacity-20 md:opacity-100 mix-blend-screen md:mix-blend-normal z-10">
            <div className="relative w-full max-w-md aspect-square">
              <svg viewBox="0 0 100 100" className="w-full h-full stroke-accent/80 overflow-visible" fill="none" strokeWidth="0.5">
                 {/* Pillar 1: Trailo (Topographic lines) */}

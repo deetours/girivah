@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { motion, useScroll, useTransform, useMotionValueEvent } from 'framer-motion'
 import { Triangle } from 'lucide-react'
 import { APPLE_EASE } from '@/lib/constants'
@@ -28,7 +28,7 @@ export function AuthoritySignalScene() {
 
   return (
     <section ref={containerRef} className="h-[400vh] relative bg-background z-20">
-      <div className="sticky top-0 h-screen flex flex-col items-center justify-center border-t border-white/5">
+      <div className="md:sticky md:top-0 h-screen flex flex-col items-center justify-center border-t border-white/5">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center opacity-5 pointer-events-none select-none">
           <Triangle size={800} strokeWidth={0.5} />
         </div>
