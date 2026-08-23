@@ -17,8 +17,7 @@ export function InfrastructureScene() {
       scrollTrigger: {
         trigger: containerRef.current,
         start: 'top top',
-        end: '+=300%', // 300vh scroll
-        pin: pinRef.current,
+        end: 'bottom bottom',
         scrub: 1,
       }
     })
@@ -50,9 +49,9 @@ export function InfrastructureScene() {
   }, { scope: containerRef })
 
   return (
-    <section ref={containerRef} className="relative w-full bg-[#050505] text-white overflow-visible">
+    <section ref={containerRef} className="relative w-full h-[400vh] bg-[#050505] text-white">
       {/* Pinned Container */}
-      <div ref={pinRef} className="h-screen w-full flex flex-col md:flex-row items-center justify-center overflow-hidden">
+      <div ref={pinRef} className="sticky top-0 h-screen w-full flex flex-col md:flex-row items-center justify-center overflow-hidden">
         
         {/* Left: Text Content (Pillars) */}
         <div className="w-full md:w-1/2 h-full flex flex-col justify-center px-8 md:px-24 relative z-20">
@@ -92,7 +91,7 @@ export function InfrastructureScene() {
         </div>
 
         {/* Right: Technical Wireframe / Blueprint Graphic */}
-        <div className="w-full md:w-1/2 h-full md:absolute md:inset-0 flex items-center justify-center pointer-events-none opacity-20 md:opacity-100 mix-blend-screen md:mix-blend-normal z-10">
+        <div className="w-full md:w-1/2 h-full absolute md:relative inset-0 flex items-center justify-center pointer-events-none opacity-20 md:opacity-100 mix-blend-screen md:mix-blend-normal z-10">
            <div className="relative w-full max-w-md aspect-square">
              <svg viewBox="0 0 100 100" className="w-full h-full stroke-accent/80 overflow-visible" fill="none" strokeWidth="0.5">
                 {/* Pillar 1: Trailo (Topographic lines) */}
