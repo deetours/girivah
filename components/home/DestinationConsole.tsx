@@ -10,15 +10,13 @@ interface DestinationConsoleProps {
   onLeaveDestination: () => void
 }
 
-const CONSOLE_DESTINATIONS = DESTINATIONS.filter(d => ['Ladakh', 'Spiti Valley', 'Zanskar'].includes(d.name))
-
 export function DestinationConsole({ onHoverDestination, onLeaveDestination }: DestinationConsoleProps) {
   const router = useRouter()
 
   return (
     <div className="w-full h-full flex flex-col justify-center items-start pl-0 md:pl-24 pt-12 md:pt-0 pointer-events-auto max-w-[500px]">
       <div className="flex flex-col gap-2 w-full font-mono">
-        {CONSOLE_DESTINATIONS.map((dest, i) => (
+        {DESTINATIONS.map((dest, i) => (
           <motion.div
             key={dest.name}
             initial={{ opacity: 0, x: 20 }}
@@ -26,7 +24,7 @@ export function DestinationConsole({ onHoverDestination, onLeaveDestination }: D
             transition={{ duration: 0.8, delay: 0.8 + (i * 0.1), ease: APPLE_EASE }}
             onMouseEnter={() => onHoverDestination(dest.name)}
             onMouseLeave={onLeaveDestination}
-            onClick={() => router.push(`/expeditions?destination=${encodeURIComponent(dest.name)}`)}
+            onClick={() => router.push(`/marketplace/search?region=${dest.regionSlug}`)}
             className="group cursor-pointer py-4 flex flex-col gap-1 w-full"
           >
             <div className="flex justify-between items-baseline text-[11px] md:text-[13px] tracking-widest uppercase">

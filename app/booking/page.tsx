@@ -19,7 +19,16 @@ import { MarketplaceItem } from '@/lib/types/marketplace'
 import { useJourneyStore } from '@/lib/store/journey-store'
 import { getItemByKind } from '@/lib/data/marketplace-lookup'
 
-const months = ['June 2024', 'July 2024', 'August 2024', 'September 2024']
+function getUpcomingMonths(count: number) {
+  const formatter = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' })
+  const now = new Date()
+  return Array.from({ length: count }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() + 1 + i, 1)
+    return formatter.format(d)
+  })
+}
+
+const months = getUpcomingMonths(4)
 
 function BookingApplicationContent() {
   const searchParams = useSearchParams()

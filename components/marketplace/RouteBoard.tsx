@@ -1,150 +1,187 @@
 'use client'
 
-import React from 'react'
+import React, { useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { ArrowRight, Map, Settings, Home } from 'lucide-react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
+import { ArrowRight, ArrowUpRight, Settings, Home, Footprints, Flag, CheckCircle } from 'lucide-react'
 import { ROUTE_GROUPS, RouteGroup } from '@/lib/data/route-board'
-import { APPLE_EASE } from '@/lib/constants'
+import { getTypeSlug, requiresVehicle } from '@/lib/marketplace/facets'
+import { useJourneyStore } from '@/lib/store/journey-store'
+import { AddToTripButton } from './AddToTripButton'
 
-const lineVariants = {
-  hidden: { pathLength: 0, opacity: 0 },
-  visible: { 
-    pathLength: 1, 
-    opacity: 0.3, 
-    transition: { duration: 1.5, ease: APPLE_EASE, delay: 0.2 } 
+function ProductPill({
+  icon: Icon,
+  label,
+  sub,
+  muted,
+  href,
+}: {
+  icon: React.ComponentType<{ size?: number; className?: string }>
+  label: string
+  sub: string
+  muted?: boolean
+  href?: string
+}) {
+  const content = (
+    <>
+      <Icon size={12} className={muted ? 'text-white/40 shrink-0' : 'text-accent shrink-0'} />
+      <div className="flex flex-col leading-tight min-w-0">
+        <span className="font-mono text-[8px] uppercase tracking-widest text-white/40">{label}</span>
+        <span className={`font-mono text-[9px] uppercase tracking-wider truncate ${muted ? 'text-white/40 italic' : 'text-white/80 group-hover/pill:text-accent'} transition-colors`}>
+          {sub}
+        </span>
+      </div>
+    </>
+  )
+  const className = `group/pill flex items-center gap-2 min-w-0 ${muted ? 'opacity-40 pointer-events-none' : ''}`
+  if (href && !muted) {
+    return (
+      <Link href={href} className={className}>
+        {content}
+      </Link>
+    )
   }
+  return <div className={className}>{content}</div>
 }
 
-function EmptyChip({ type }: { type: 'vehicle' | 'stay' }) {
+function RouteCard({ group, onBuild }: { group: RouteGroup; index: number; onBuild: () => void }) {
+  const isTrek = getTypeSlug(group.trip) === 'trek'
+  const needsVehicle = requiresVehicle(group.trip)
+
   return (
-    <div className="flex-1 min-w-[200px] border border-dashed border-white/10 flex items-center justify-center p-6 bg-[#050505]/20 backdrop-blur-sm">
-      <div className="flex items-center gap-3 opacity-30">
-        {type === 'vehicle' ? <Settings size={14} /> : <Home size={14} />}
-        <span className="font-mono text-[9px] md:text-[10px] tracking-widest uppercase">
-          No {type} partner on this route yet
-        </span>
+    <div
+      data-route-card
+      className="group relative bg-[#0A0A0A] border border-white/10 hover:border-accent/40 transition-colors duration-500 flex flex-col overflow-hidden h-full"
+    >
+      <Link href={`/expeditions/${group.trip.slug}`} className="flex flex-col flex-1 min-h-0">
+        <div className="relative w-full overflow-hidden aspect-[16/10]">
+          <Image
+            src={group.trip.image}
+            alt={group.trip.title}
+            fill
+            className="object-cover grayscale opacity-70 group-hover:opacity-100 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] to-transparent" />
+
+          <div className="absolute top-4 left-4 flex items-center gap-1.5 text-white/70 bg-[#050505]/60 backdrop-blur-md px-2.5 py-1.5 border border-white/10">
+            {isTrek ? <Footprints size={10} /> : <Flag size={10} />}
+            <span className="font-mono text-[8px] uppercase tracking-widest">{isTrek ? 'Trek' : 'Road Trip'}</span>
+          </div>
+
+          <div className="absolute top-0 right-0 w-0 h-0 border-t-[56px] border-l-[56px] border-t-accent border-l-transparent z-20 transition-transform duration-500 origin-top-right group-hover:scale-110" />
+          <div className="absolute top-1.5 right-1.5 z-30 text-white font-mono text-[8px] tracking-widest rotate-45 origin-center -translate-y-0.5 translate-x-0.5">
+            {group.trip.maxElevation}
+          </div>
+
+          {/* Same hover-action pattern as ProductCard (/expeditions, /rides, /stays) for consistency */}
+          <div className="absolute bottom-3 right-3 z-30 flex items-center gap-2 opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100 transition-all duration-500">
+            <AddToTripButton item={group.trip} variant="compact" />
+            <div className="flex items-center justify-center w-10 h-10 bg-white text-black shrink-0">
+              <ArrowUpRight size={16} />
+            </div>
+          </div>
+        </div>
+
+        <div className="relative z-10 flex-1 p-5 md:p-6 flex flex-col justify-end">
+          <h3 className="font-display text-white uppercase tracking-tighter leading-none mb-2 text-xl md:text-2xl group-hover:text-accent transition-colors duration-300">
+            {group.trip.title}
+          </h3>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[9px] md:text-[10px] text-white/50 tracking-widest uppercase">
+            <span>{group.regionLabel}</span>
+            <span>{group.trip.duration}</span>
+            <span className="text-white">{group.trip.price}</span>
+          </div>
+        </div>
+      </Link>
+
+      {/* Ride / Stay — each independently addable, never implied mandatory */}
+      <div className="relative z-10 px-5 md:px-6 pt-4 border-t border-white/5 flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-3">
+          {needsVehicle ? (
+            group.vehicle ? (
+              <ProductPill icon={Settings} label="Ride" sub={group.vehicle.name} href={`/rides?region=${group.regionSlug}`} />
+            ) : (
+              <ProductPill icon={Settings} label="Ride" sub="Coming Soon" muted />
+            )
+          ) : (
+            <ProductPill icon={Footprints} label="Ride" sub="On Foot" />
+          )}
+          {needsVehicle && group.vehicle && <AddToTripButton item={group.vehicle} variant="compact" label={group.vehicle.name} />}
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          {group.stay ? (
+            <ProductPill icon={Home} label="Stay" sub={group.stay.name} href={`/stays?region=${group.regionSlug}`} />
+          ) : (
+            <ProductPill icon={Home} label="Stay" sub="Coming Soon" muted />
+          )}
+          {group.stay && <AddToTripButton item={group.stay} variant="compact" label={group.stay.name} />}
+        </div>
+      </div>
+
+      <div className="relative z-10 px-5 md:px-6 pb-5 md:pb-6 pt-3 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-1.5 text-white/30">
+          <CheckCircle size={10} className="text-accent/70" />
+          <span className="font-mono text-[8px] uppercase tracking-widest">Verified Provider</span>
+        </div>
+        <button
+          onClick={onBuild}
+          className="flex items-center gap-1.5 text-[9px] tracking-[0.2em] uppercase text-white/40 hover:text-accent transition-colors font-mono"
+        >
+          Build Bundle <ArrowRight size={10} />
+        </button>
       </div>
     </div>
   )
 }
 
-function EcosystemChip({ type, data }: { type: 'vehicle' | 'stay', data: any }) {
-  const Icon = type === 'vehicle' ? Settings : Home
-  const linkBase = type === 'vehicle' ? '/rides' : '/stays'
-  const linkLabel = type === 'vehicle' ? 'RESERVE MACHINE' : 'SECURE REFUGE'
-
-  return (
-    <Link 
-      href={`${linkBase}?category=${data.category}`}
-      className="flex-1 min-w-[200px] group relative border border-white/10 hover:border-accent/40 bg-[#0A0A0A] p-6 transition-colors duration-300 flex flex-col justify-between overflow-hidden"
-    >
-      <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-      
-      {/* HUD Brackets */}
-      <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/20 group-hover:border-accent transition-colors" />
-      <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20 group-hover:border-accent transition-colors" />
-
-      <div>
-        <div className="flex items-center gap-2 text-white/40 mb-3">
-          <Icon size={12} className="group-hover:text-accent transition-colors" />
-          <span className="font-mono text-[9px] uppercase tracking-widest">{type === 'vehicle' ? 'MACHINE' : 'REFUGE'}</span>
-        </div>
-        <h4 className="font-display text-lg text-white group-hover:text-accent transition-colors leading-tight mb-2 truncate">
-          {data.name}
-        </h4>
-        <span className="font-mono text-[10px] text-white/50 tracking-widest uppercase">
-          {type === 'vehicle' ? data.altitudeRating : data.elevation} · {data.region}
-        </span>
-      </div>
-
-      <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/10">
-        <span className="font-mono text-xs text-white tabular-nums">
-          {type === 'vehicle' ? data.dailyRate : data.nightlyRate}
-        </span>
-        <div className="flex items-center gap-2 text-[9px] text-accent tracking-[0.2em] uppercase opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0 duration-300">
-          {linkLabel} <ArrowRight size={10} />
-        </div>
-      </div>
-    </Link>
-  )
-}
-
-function RouteRow({ group, index }: { group: RouteGroup, index: number }) {
-  return (
-    <motion.section 
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 1.2, ease: APPLE_EASE }}
-      className="relative flex flex-col lg:flex-row gap-6 lg:gap-12 w-full items-stretch py-12"
-    >
-      {/* Center Connector SVG (Desktop Only) */}
-      <div className="hidden lg:block absolute left-[55%] top-1/2 -translate-y-1/2 w-[10%] h-full pointer-events-none z-0">
-        <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 100 100">
-          <motion.path 
-            d="M 0 50 L 50 50 L 50 25 L 100 25 M 50 50 L 50 75 L 100 75" 
-            fill="none" 
-            stroke="#FF3E00" 
-            strokeWidth="0.5"
-            variants={lineVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          />
-        </svg>
-      </div>
-
-      {/* Primary Trip Card */}
-      <Link href={`/expeditions/${group.trip.slug}`} className="w-full lg:w-[55%] group relative bg-[#0A0A0A] border border-white/10 hover:border-accent/40 transition-colors duration-500 overflow-hidden flex flex-col h-[400px] md:h-[500px]">
-        {/* Accent Triangle */}
-        <div className="absolute top-0 right-0 w-0 h-0 border-t-[80px] border-l-[80px] border-t-accent border-l-transparent z-20 transition-transform duration-500 origin-top-right group-hover:scale-110" />
-        <div className="absolute top-2 right-2 z-30 text-white font-mono text-[9px] tracking-widest rotate-45 origin-center -translate-y-1 translate-x-1">
-          {group.trip.maxElevation}
-        </div>
-
-        <div className="relative w-full h-[65%] overflow-hidden">
-          <Image
-            src={group.trip.image}
-            alt={group.trip.title}
-            fill
-            className="object-cover grayscale opacity-60 group-hover:opacity-80 group-hover:scale-105 transition-all duration-700"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] to-transparent" />
-          
-          <div className="absolute top-6 left-6 flex items-center gap-2 text-white/50 bg-[#050505]/50 backdrop-blur-md px-3 py-1.5 border border-white/10">
-            <Map size={12} />
-            <span className="font-mono text-[9px] uppercase tracking-widest">ROUTE</span>
-          </div>
-        </div>
-
-        <div className="relative z-10 flex-1 p-6 md:p-8 flex flex-col justify-end bg-[#0A0A0A]">
-          <h3 className="font-display text-3xl md:text-5xl text-white uppercase tracking-tighter leading-none mb-3 group-hover:text-accent transition-colors duration-300">
-            {group.trip.title}
-          </h3>
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[10px] md:text-[11px] text-white/50 tracking-widest uppercase">
-            <span>{group.regionLabel}</span>
-            <span>{group.trip.duration}</span>
-            <span className="text-white">{group.trip.price}</span>
-          </div>
-          
-          <div className="absolute bottom-8 right-8 flex items-center gap-2 text-[10px] text-accent tracking-[0.2em] uppercase opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0 duration-500">
-            VIEW DOSSIER <ArrowRight size={14} />
-          </div>
-        </div>
-      </Link>
-
-      {/* Ecosystem Chips (Right Side) */}
-      <div className="w-full lg:w-[35%] flex flex-col gap-6 relative z-10 lg:py-8 justify-center">
-        {group.vehicle ? <EcosystemChip type="vehicle" data={group.vehicle} /> : <EmptyChip type="vehicle" />}
-        {group.stay ? <EcosystemChip type="stay" data={group.stay} /> : <EmptyChip type="stay" />}
-      </div>
-    </motion.section>
-  )
-}
-
 export function RouteBoard() {
+  const gridRef = useRef<HTMLDivElement>(null)
+  const addItem = useJourneyStore((s) => s.addItem)
+  const openDrawer = useJourneyStore((s) => s.openDrawer)
+
+  useGSAP(
+    () => {
+      gsap.registerPlugin(ScrollTrigger)
+      const cards = gridRef.current?.querySelectorAll('[data-route-card]')
+      if (!cards?.length) return
+
+      const mm = gsap.matchMedia()
+      mm.add('(prefers-reduced-motion: no-preference)', () => {
+        gsap.fromTo(
+          cards,
+          { opacity: 0, y: 40, scale: 0.96 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.5,
+            ease: 'back.out(1.4)',
+            stagger: { each: 0.08, from: 'start', grid: 'auto' },
+            scrollTrigger: { trigger: gridRef.current, start: 'top 85%' },
+          }
+        )
+      })
+
+      return () => mm.revert()
+    },
+    { scope: gridRef }
+  )
+
+  function handleBuild(group: RouteGroup) {
+    // Only the trip is added here — ride/stay stay exactly as the user already
+    // set them via this card's own AddToTripButtons, never silently re-decided.
+    addItem({ slug: group.trip.slug, kind: 'trip' })
+    const manifest = document.getElementById('choose-destination')
+    if (manifest) {
+      manifest.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    } else {
+      openDrawer()
+    }
+  }
+
   return (
     <section className="w-full bg-[#050505] py-32 px-6 md:px-12 relative overflow-hidden">
       {/* Background Graticule for visual consistency with Hero */}
@@ -160,24 +197,18 @@ export function RouteBoard() {
       </div>
 
       <div className="max-w-[1440px] mx-auto relative z-10">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, ease: APPLE_EASE }}
-          className="mb-20 max-w-2xl"
-        >
+        <div className="mb-20 max-w-2xl">
           <h2 className="font-display text-4xl md:text-6xl text-white uppercase tracking-tighter leading-[0.9]">
-            The <span className="text-accent">Route Board.</span>
+            The <span className="text-accent">Full Trip.</span>
           </h2>
           <p className="font-sans text-[13px] font-light tracking-wide text-white/50 mt-6 leading-relaxed border-l border-white/20 pl-4">
-            A route is not an ecosystem. Select a territory below to view the verified machines and refuges engineered specifically for that terrain.
+            Trips, rides, and stays — grab exactly what you need, or take the whole route bundled.
           </p>
-        </motion.div>
+        </div>
 
-        <div className="flex flex-col gap-12 lg:gap-0">
+        <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 items-stretch">
           {ROUTE_GROUPS.map((group, i) => (
-            <RouteRow key={group.regionSlug} group={group} index={i} />
+            <RouteCard key={group.trip.slug} group={group} index={i} onBuild={() => handleBuild(group)} />
           ))}
         </div>
       </div>

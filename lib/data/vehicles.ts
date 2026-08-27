@@ -53,6 +53,27 @@ export const vehicles: Vehicle[] = [
     highlights: ['Arctic Tune', 'All-Terrain Tires', 'Recovery Kit'],
     status: 'Active',
   },
+  {
+    id: 'gypsy-4x4',
+    slug: 'gypsy-4x4',
+    title: 'Maruti Gypsy 4x4',
+    kind: 'vehicle',
+    fromPrice: 5500,
+    media: [{ src: '/exp-ladakh.jpg', alt: 'Maruti Gypsy 4x4' }],
+    availability: 'available',
+    providerId: 'prov-1',
+    name: 'Maruti Gypsy 4x4',
+    category: '4x4',
+    regionSlug: 'zanskar',
+    region: 'Zanskar Valley',
+    altitudeRating: '4,400m',
+    dailyRate: '₹5,500',
+    image: '/exp-ladakh.jpg',
+    highlights: ['Short-Wheelbase Agility', 'Snow Chains Fitted', 'Recovery Winch'],
+    status: 'Active',
+  },
 ]
+
+// seed data — swap for a real backend/CMS later
 
 export function getVehicleBySlug(slug: string): Vehicle | undefined { return vehicles.find(v => v.slug === slug); }

@@ -67,8 +67,15 @@ export default function Navigation() {
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-10 z-50">
             <SearchTrigger />
-            
-            <button 
+
+            <Link
+              href="/marketplace/search"
+              className={`text-[10px] tracking-[0.3em] font-sans uppercase transition-colors duration-300 ${pathname === '/marketplace/search' ? 'text-accent' : 'text-white/40 hover:text-white'}`}
+            >
+              Browse All
+            </Link>
+
+            <button
               onClick={() => setMegaMenuOpen(!megaMenuOpen)}
               className={`text-[10px] tracking-[0.3em] font-sans uppercase transition-colors duration-300 flex items-center gap-2 ${megaMenuOpen ? 'text-accent' : 'text-white/40 hover:text-white'}`}
             >
@@ -156,6 +163,13 @@ export default function Navigation() {
                 className={`font-display text-5xl tracking-tight transition-colors ${pathname === '/marketplace' ? 'text-accent' : 'text-white'}`}
               >
                 Marketplace
+              </Link>
+              <Link
+                href="/marketplace/search"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`font-display text-2xl tracking-tight transition-colors ${pathname === '/marketplace/search' ? 'text-accent' : 'text-white/60'}`}
+              >
+                Browse All
               </Link>
               <Link
                 href="/expeditions"

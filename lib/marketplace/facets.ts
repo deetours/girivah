@@ -59,6 +59,15 @@ export function getTypeSlug(item: any): string | undefined {
 }
 
 /**
+ * A trek is a foot expedition — it structurally has no vehicle, by design,
+ * not because one hasn't been assigned yet. Used to tell that state apart
+ * from a genuine "ride not available" gap.
+ */
+export function requiresVehicle(trip: any): boolean {
+  return getTypeSlug(trip) !== 'trek';
+}
+
+/**
  * Extracts a numeric days value from a duration string like "14 Days"
  */
 export function getDurationDays(item: any): number | undefined {

@@ -10,18 +10,20 @@ interface AddToTripButtonProps {
   item: MarketplaceItem;
   variant?: 'compact' | 'labeled';
   className?: string;
+  label?: string;
 }
 
-export function AddToTripButton({ item, variant = 'labeled', className = '' }: AddToTripButtonProps) {
+export function AddToTripButton({ item, variant = 'labeled', className = '', label }: AddToTripButtonProps) {
   const { items, addItem, removeItem, hasItem } = useJourneyStore()
-  
+
   const key = `${item.kind}:${item.slug}`
   const isInBag = hasItem(key)
+  const itemLabel = label ?? item.title
 
   const handleToggle = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    
+
     if (isInBag) {
       removeItem(key)
     } else {
@@ -33,9 +35,11 @@ export function AddToTripButton({ item, variant = 'labeled', className = '' }: A
     return (
       <button
         onClick={handleToggle}
+        aria-label={`${isInBag ? 'Remove' : 'Add'} ${itemLabel} ${isInBag ? 'from' : 'to'} your trip`}
+        title={`${isInBag ? 'Remove' : 'Add'} ${itemLabel}`}
         className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors border backdrop-blur-md z-40 ${
-          isInBag 
-            ? 'bg-accent/20 border-accent/60 text-accent' 
+          isInBag
+            ? 'bg-accent/20 border-accent/60 text-accent'
             : 'bg-black/40 border-white/10 text-white/70 hover:bg-white/10 hover:text-white'
         } ${className}`}
       >

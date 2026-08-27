@@ -10,51 +10,14 @@ import Link from 'next/link'
 import { useRef } from 'react'
 import { motion, useScroll, useTransform, useInView } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
+import { getFeaturedArticle, getOtherArticles, JournalArticle } from '@/lib/data/journal'
 
 const APPLE_EASE = [0.32, 0.72, 0, 1] as const
 
-const FEATURED_ARTICLE = {
-  id: 'the-silence-of-spiti',
-  title: 'The Silence of Spiti',
-  category: 'Field Notes',
-  excerpt: 'A meditation on emptiness. We rode 400 kilometers into the high cold desert to understand what happens when the noise finally stops.',
-  image: '/hero-mountain.jpg',
-  date: 'Oct 2024',
-  issue: 'Vol. 01, No. 03',
-}
+const FEATURED_ARTICLE = getFeaturedArticle()
+const ARTICLES = getOtherArticles()
 
-const ARTICLES = [
-  {
-    id: 'oxygen-deprivation-and-clarity',
-    title: 'Oxygen Deprivation & Clarity',
-    category: 'Physiology',
-    excerpt: 'Above 15,000 feet, the brain begins to slow down. But in that sluggishness, a profound sense of singular focus emerges.',
-    date: 'Sep 2024',
-  },
-  {
-    id: 'chadar-trek-equipment',
-    title: 'Surviving the Frozen River',
-    category: 'Gear Guide',
-    excerpt: 'The Chadar trek doesn\'t just test your endurance, it tests your systems. A complete breakdown for -30°C in Zanskar.',
-    date: 'Jan 2024',
-  },
-  {
-    id: 'the-art-of-the-motorcycle-expedition',
-    title: 'The Art of the Motorcycle Expedition',
-    category: 'Philosophy',
-    excerpt: 'Why four wheels move the body, but two wheels move the soul. The inherent vulnerability of riding through the roof of the world.',
-    date: 'Aug 2024',
-  },
-  {
-    id: 'lamo-the-nammal',
-    title: 'Keeper of the High Pass',
-    category: 'Interviews',
-    excerpt: 'An interview with Namgyal, who has lived above 14,000 feet for sixty-eight years, watching the glaciers recede and the roads appear.',
-    date: 'Jul 2024',
-  },
-]
-
-function ArticleCard({ article, index }: { article: typeof ARTICLES[0], index: number }) {
+function ArticleCard({ article, index }: { article: JournalArticle, index: number }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, amount: 0.2 })
 

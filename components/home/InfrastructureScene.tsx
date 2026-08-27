@@ -57,31 +57,34 @@ export function InfrastructureScene() {
         <div className="w-full md:w-1/2 h-full flex flex-col justify-center px-8 md:px-24 relative z-20">
           
           <div className="text-[10px] uppercase font-mono tracking-[0.4em] text-white/30 mb-12">
-             System Diagnostics
+             What's Included
           </div>
 
           <div className="relative h-[200px] w-full">
             <div className="pillar-0 absolute inset-0 flex flex-col">
+              <span className="text-[10px] uppercase font-mono tracking-[0.3em] text-accent/70 mb-3">Trailo</span>
               <h3 className="font-display text-4xl md:text-5xl uppercase text-white mb-6 tracking-tighter">
-                TRAILO // THE TOPOLOGY
+                Road Trips &amp; Treks
               </h3>
               <p className="font-sans text-sm md:text-base font-light text-white/60 leading-relaxed max-w-md">
                 Engineered routes. We don't just map the high passes; we survey the gradients, calculate the fuel drops, and verify the conditions. The route is not a suggestion—it is a confirmed path.
               </p>
             </div>
-            
+
             <div className="pillar-1 absolute inset-0 flex flex-col">
+              <span className="text-[10px] uppercase font-mono tracking-[0.3em] text-accent/70 mb-3">Rido</span>
               <h3 className="font-display text-4xl md:text-5xl uppercase text-white mb-6 tracking-tighter">
-                RIDO // THE MACHINE
+                4×4s &amp; Motorcycles
               </h3>
               <p className="font-sans text-sm md:text-base font-light text-white/60 leading-relaxed max-w-md">
                 Maintained for the void. 4x4s and motorcycles tuned specifically for altitude, oxygen deprivation, and zero-traction environments. Built to survive where standard rentals fail.
               </p>
             </div>
-            
+
             <div className="pillar-2 absolute inset-0 flex flex-col">
+              <span className="text-[10px] uppercase font-mono tracking-[0.3em] text-accent/70 mb-3">Stayo</span>
               <h3 className="font-display text-4xl md:text-5xl uppercase text-white mb-6 tracking-tighter">
-                STAYO // THE REFUGE
+                Places to Stay
               </h3>
               <p className="font-sans text-sm md:text-base font-light text-white/60 leading-relaxed max-w-md">
                 Shelter at the edge of the map. Pre-verified outposts, isolated camps, and high-altitude lodges. When the temperature drops to -20°C, you don't guess where you're sleeping.

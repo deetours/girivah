@@ -7,12 +7,14 @@ import { Triangle } from 'lucide-react'
 import { APPLE_EASE } from '@/lib/constants'
 
 import { HeroV2 as MarketplaceHero } from '@/components/marketplace/HeroV2'
+import { TripBuilderScene } from '@/components/marketplace/TripBuilderScene'
 import { RouteBoard as JourneyRail } from '@/components/marketplace/RouteBoard'
 import { DestinationsScene } from '@/components/marketplace/DestinationsScene'
 import { TrustScene } from '@/components/marketplace/TrustScene'
 import { AuthoritySignalScene } from '@/components/home/AuthoritySignalScene'
 import { ManifestScene } from '@/components/home/ManifestScene'
 import { InfrastructureScene } from '@/components/home/InfrastructureScene'
+import { TripMatchScene } from '@/components/marketplace/TripMatchScene'
 
 export default function MarketplacePage() {
   return (
@@ -24,11 +26,17 @@ export default function MarketplacePage() {
         {/* ═ THE INFRASTRUCTURE (Ecosystem Stack) ═ */}
         <InfrastructureScene />
 
+        {/* ═ BUILD YOUR MANIFEST (unified tabbed builder) ═ */}
+        <TripBuilderScene />
+
         {/* The Route Board / Journey Rail */}
         <JourneyRail />
 
         {/* ═ THE MANIFEST ═ */}
         <ManifestScene />
+
+        {/* ═ FIND YOUR ROUTE (Lead Capture Quiz) ═ */}
+        <TripMatchScene />
 
         {/* ═ THE DISPATCH (Traveler Story Split) ═ */}
         <section className="h-[100vh] min-h-[800px] w-full bg-background flex flex-col md:flex-row relative z-20">

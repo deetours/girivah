@@ -4,7 +4,7 @@ import React, { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowRight, Triangle } from 'lucide-react'
-import { DESTINATIONS } from '@/lib/constants'
+import { DESTINATIONS, DESTINATION_MICROSITES } from '@/lib/constants'
 import Image from 'next/image'
 
 const APPLE_EASE = [0.32, 0.72, 0, 1] as const
@@ -12,7 +12,8 @@ const APPLE_EASE = [0.32, 0.72, 0, 1] as const
 const DESTINATION_IMAGES: Record<string, string> = {
   'Ladakh': '/exp-ladakh.jpg',
   'Spiti Valley': '/exp-spiti.jpg',
-  'Himachal Pradesh': '/hero-mountain.jpg'
+  'Himachal Pradesh': '/hero-mountain.jpg',
+  'Zanskar': '/exp-ladakh.jpg',
 }
 
 export default function DestinationsIndex() {
@@ -76,10 +77,9 @@ export default function DestinationsIndex() {
       <section className="max-w-[1400px] mx-auto px-6 md:px-12 py-24 space-y-32">
         {DESTINATIONS.map((dest, i) => {
           const isReversed = i % 2 !== 0
-          // Construct the slug from the name. e.g. "Spiti Valley" -> "spiti"
-          // We only have /destinations/ladakh and /destinations/spiti at the moment
-          let linkSlug = dest.name.toLowerCase().split(' ')[0]
-          
+          const destHref = DESTINATION_MICROSITES[dest.regionSlug]
+            ?? `/marketplace/search?region=${dest.regionSlug}`
+
           return (
             <motion.div 
               key={dest.name}
@@ -95,7 +95,7 @@ export default function DestinationsIndex() {
                    transition={{ duration: 0.8, ease: APPLE_EASE }}
                    className="w-full h-full"
                  >
-                   <Link href={`/destinations/${linkSlug}`}>
+                   <Link href={destHref}>
                      <Image 
                        src={DESTINATION_IMAGES[dest.name] || '/hero-mountain.jpg'} 
                        alt={dest.name} 
@@ -127,7 +127,7 @@ export default function DestinationsIndex() {
                       ))}
                     </ul>
                  </div>
-                 <Link href={`/destinations/${linkSlug}`} className="btn-ghost px-8 py-4 text-[10px] tracking-[0.2em] inline-flex items-center gap-3">
+                 <Link href={destHref} className="btn-ghost px-8 py-4 text-[10px] tracking-[0.2em] inline-flex items-center gap-3">
                    Explore Region <ArrowRight size={14} />
                  </Link>
               </div>

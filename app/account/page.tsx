@@ -4,11 +4,13 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowUpRight, LogOut, FileText, Compass, Settings } from 'lucide-react'
+import { getActiveBooking, formatDepartureDate } from '@/lib/data/account'
 
 export default function AccountDashboard() {
   const router = useRouter()
   const [isAuth, setIsAuth] = useState<boolean | null>(null)
-  
+  const booking = getActiveBooking()
+
   // Quick mock auth check
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -56,14 +58,14 @@ export default function AccountDashboard() {
                       <div className="absolute inset-0 bg-gradient-to-r from-accent/5 to-transparent z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
                       <div className="relative z-10 flex flex-col md:flex-row justify-between items-start gap-8">
                          <div>
-                            <span className="text-accent text-[10px] tracking-[0.3em] uppercase mb-2 block">GVH-39X1A</span>
-                            <h3 className="font-display text-3xl md:text-4xl mb-4">Ladakh High Pass</h3>
+                            <span className="text-accent text-[10px] tracking-[0.3em] uppercase mb-2 block">{booking.ref}</span>
+                            <h3 className="font-display text-3xl md:text-4xl mb-4">{booking.expedition?.title ?? 'Active Protocol'}</h3>
                             <div className="flex gap-6 text-[10px] font-sans tracking-[0.2em] uppercase text-white/40">
-                               <span>Departs: Sep 14, 2024</span>
-                               <span>Status: Confirmed</span>
+                               <span>Departs: {formatDepartureDate(booking.departsAt)}</span>
+                               <span>Status: {booking.status}</span>
                             </div>
                          </div>
-                         <Link href="/account/dossier/1" className="btn-ghost px-6 py-3 flex items-center gap-2 text-[10px] whitespace-nowrap">
+                         <Link href={`/account/dossier/${booking.id}`} className="btn-ghost px-6 py-3 flex items-center gap-2 text-[10px] whitespace-nowrap">
                             Access Dossier <ArrowUpRight size={14} />
                          </Link>
                       </div>

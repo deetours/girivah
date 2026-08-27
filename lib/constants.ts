@@ -31,6 +31,7 @@ export const DIFFICULTY_LEVELS = [
 
 export interface Destination {
   name: string
+  regionSlug: string
   region: string
   description: string
   highlights: string[]
@@ -42,6 +43,7 @@ export interface Destination {
 export const DESTINATIONS: Destination[] = [
   {
     name: 'Ladakh',
+    regionSlug: 'ladakh',
     region: 'Kashmir Region',
     description: 'High desert majesty and pristine passes',
     highlights: ['Khardung La', 'Pangong Lake', 'Nubra Valley'],
@@ -51,6 +53,7 @@ export const DESTINATIONS: Destination[] = [
   },
   {
     name: 'Spiti Valley',
+    regionSlug: 'spiti',
     region: 'Himachal Pradesh',
     description: 'Ancient monasteries and remote terrain',
     highlights: ['Kaza', 'Ki Monastery', 'Tso Moriri'],
@@ -60,6 +63,7 @@ export const DESTINATIONS: Destination[] = [
   },
   {
     name: 'Himachal Pradesh',
+    regionSlug: 'himachal',
     region: 'Western Himalayas',
     description: 'Lush valleys and cultural richness',
     highlights: ['Kinnaur', 'Rampur', 'Chitkul'],
@@ -69,6 +73,7 @@ export const DESTINATIONS: Destination[] = [
   },
   {
     name: 'Zanskar',
+    regionSlug: 'zanskar',
     region: 'Ladakh Region',
     description: 'Frozen rivers and isolated settlements',
     highlights: ['Chadar', 'Padum', 'Phugtal'],
@@ -77,6 +82,13 @@ export const DESTINATIONS: Destination[] = [
     status: 'Winter Route',
   }
 ]
+
+// Regions with a bespoke microsite; every other destination routes into the
+// live, filtered marketplace results instead of a page that doesn't exist yet.
+export const DESTINATION_MICROSITES: Record<string, string> = {
+  ladakh: '/destinations/ladakh',
+  spiti: '/destinations/spiti',
+}
 
 // Contact info
 export const CONTACT_INFO = {
